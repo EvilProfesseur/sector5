@@ -1,26 +1,26 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { DecodeText } from './components/decode-text/decodeText';
+import { GradientBlur } from './components/gradient-blur/gradientBlur';
+import { fadingTriangles } from './components/shader-bg/fading-triangles/fading-triangles';
+import { recursion } from './components/shader-bg/recursion/recursion';
+import { ShaderBG } from './components/shader-bg/shaderBg';
+import { ether } from './components/shader-bg/shaders/ether/ether';
+import { proteanClouds } from './components/shader-bg/shaders/proteanClouds/protheanClouds';
 
-function App() {
+import './style.scss';
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="bg">
+      <ShaderBG shader={recursion} />
+      <div className="bg-image"></div>
+      <div className="title">
+        <DecodeText text="GIGGER" />
+        <h4>v4.52</h4>
+      </div>
+      <GradientBlur />
+      <div className="circle circle1"></div>
+      <div className="circle circle2"></div>
+      <div className="circle circle3"></div>
     </div>
   );
 }
-
-export default App;

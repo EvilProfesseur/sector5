@@ -1,0 +1,9 @@
+.shader-wrapper {
+  position: absolute;
+  top: 0;
+
+  canvas {
+    width: 100vw!important;
+    height: 100vh!important;
+  }
+}
