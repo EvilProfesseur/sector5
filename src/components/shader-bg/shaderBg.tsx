@@ -1,19 +1,28 @@
-import { FC, useLayoutEffect, useRef } from 'react';
+import { FC, useEffect, useLayoutEffect, useRef } from 'react';
 import { ShaderCanvas } from 'shader-canvas';
-import { IShader, IUniformUpdateData, UniformsRequired } from './shader.types';
+import { IShaderBGProps, IUniformUpdateData, UniformsRequired } from './shader.types';
 
 import './shaderBg.scss';
 
-export const ShaderBG: FC<{ shader: IShader }> = (props) => {
+/**
+ * A component used to render a fragment shader to canvas
+ * @param shader {IShader} shader data required for render
+ */
+export const ShaderBG: FC<IShaderBGProps> = ({shader, classNames = '', resolutionModifier = 1}) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const shaderCanvas = new ShaderCanvas();
+  const uniforms: IUniformUpdateData = {
+    time: 0,
+    height: 1536,
+    width: 494,
+    mouse: [0,0,0,0]
+  }
 
   const renderFrame = () => {
     let animReq: number;
     const animate = (timestamp: number) => {
-      setUniforms({
-        time: timestamp / 1000,
-      })
+      uniforms.time = timestamp / 1000;
+      setUniforms()
       shaderCanvas.render();
       animReq = window.requestAnimationFrame(animate);
     };
@@ -21,38 +30,49 @@ export const ShaderBG: FC<{ shader: IShader }> = (props) => {
   };
 
   const initShaderCanvas = () => {
-    const width = window.innerWidth / 4;
-    const height = window.innerHeight / 4;
+    uniforms.height = wrapperRef!.current!.getBoundingClientRect().height * window.devicePixelRatio;
+    uniforms.width = wrapperRef!.current!.getBoundingClientRect().width * window.devicePixelRatio;
 
-    shaderCanvas.setShader(props.shader.code);
-    shaderCanvas.setSize(width, height);
-    setUniforms({width, height, time: 0});
+    shaderCanvas.setShader(shader.code);
+    shaderCanvas.setSize(uniforms.width / window.devicePixelRatio, uniforms.height / window.devicePixelRatio);
+    setUniforms();
 
     wrapperRef.current?.appendChild(shaderCanvas.domElement);
     renderFrame();
   };
 
-  const setUniforms = (updateData: IUniformUpdateData) => {
-    const uniformsRequired = props.shader.uniformsRequired;
+  const setUniforms = () => {
+    const uniformsRequired = shader.uniformsRequired;
 
     if (uniformsRequired.includes(UniformsRequired.resolution)) {
       shaderCanvas.setUniform('iResolution', [
-        (window.innerWidth / 2) * window.devicePixelRatio,
-        (window.innerHeight / 2) * window.devicePixelRatio,
-        1.0,
+        uniforms.width,
+        uniforms.height,
+        window.devicePixelRatio,
       ]);
     }
 
     if (uniformsRequired.includes(UniformsRequired.time)) {
-      shaderCanvas.setUniform('iTime', updateData.time!);
+      shaderCanvas.setUniform('iTime', uniforms.time);
     }
 
     if (uniformsRequired.includes(UniformsRequired.mouse)) {
-      shaderCanvas.setUniform('iMouse', [0, 0, 0]);
+      shaderCanvas.setUniform('iMouse', uniforms.mouse);
     }
   }
 
   useLayoutEffect(initShaderCanvas, []);
 
-  return <div ref={wrapperRef} className="shader-wrapper"></div>;
+  useEffect(function handleResize() {
+    const setDimenions = () => {
+      const wrapperRect = wrapperRef.current?.getBoundingClientRect();
+      uniforms.height = wrapperRect ? wrapperRect.height * resolutionModifier : uniforms.height;
+      uniforms.width = wrapperRect? wrapperRect.width * resolutionModifier : uniforms.width;
+    }
+    window.addEventListener('resize', setDimenions);
+
+    return () => window.removeEventListener('resize', setDimenions);
+  }, [])
+
+  return <div ref={wrapperRef} className={`shader-wrapper ${classNames}`}></div>;
 };

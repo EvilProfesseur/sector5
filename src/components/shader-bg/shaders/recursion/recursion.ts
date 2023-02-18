@@ -1,4 +1,4 @@
-import { IShader, UniformsRequired } from "../shader.types";
+import { IShader, UniformsRequired } from "../../shader.types";
 
 export const recursion: IShader = {
     uniformsRequired: [UniformsRequired.resolution, UniformsRequired.time],

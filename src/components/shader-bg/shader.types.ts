@@ -10,8 +10,14 @@ export interface IShader {
 }
 
 export interface IUniformUpdateData {
-    width?: number,
-    height?: number,
-    time?: number,
-    mouse?: {x: number, y: number, z: number, w: number}
+    width: number,
+    height: number,
+    time: number,
+    mouse: [number, number, number, number]
+}
+
+export interface IShaderBGProps {
+    shader: IShader,
+    resolutionModifier?: number;
+    classNames?: string;
 }

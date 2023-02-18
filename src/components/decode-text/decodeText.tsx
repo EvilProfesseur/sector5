@@ -1,14 +1,44 @@
-import { useEffect } from 'react';
-import * as React from 'react';
+import { useEffect, useRef, FC, useCallback } from 'react';
 import './decodeText.scss';
+import { IDecodeTextProps } from './decodeText.types';
 
-export const DecodeText: React.FC<{ text: string }> = (props) => {
-  const textArray = props.text.split('');
+export const DecodeText: FC<IDecodeTextProps> = ({text, classNames, delay = 0}) => {
+  const textRef = useRef<HTMLDivElement>(null);
+  const textArray = text.split('');
 
-  const decode = () => {
-    const text = document.getElementsByClassName('decode-text')[0];
-    // debug with
-    // console.log(text, text.children.length);
+  // send the node for later .state changes
+  const firstStages = useCallback((child: Element) => {
+    if (child.classList.contains('state-2')) {
+      child.classList.add('state-3');
+    } else if (child.classList.contains('state-1')) {
+      child.classList.add('state-2');
+    } else if (!child.classList.contains('state-1')) {
+      child.classList.add('state-1');
+      setTimeout(secondStages.bind(null, child), 100);
+    }
+  }, []);
+
+  const secondStages = (child: Element) => {
+    if (child.classList.contains('state-1')) {
+      child.classList.add('state-2');
+      setTimeout(thirdStages.bind(null, child), 100);
+    } else if (!child.classList.contains('state-1')) {
+      child.classList.add('state-1');
+    }
+  };
+
+  const thirdStages = (child: Element) => {
+    if (child.classList.contains('state-2')) {
+      child.classList.add('state-3');
+    }
+  };
+
+  const decode = useCallback(() => {
+    const text = textRef.current;
+    
+    if (!text) {
+      return;
+    }
 
     // assign the placeholder array its places
     const state = [];
@@ -30,34 +60,7 @@ export const DecodeText: React.FC<{ text: string }> = (props) => {
         setTimeout(firstStages.bind(null, child), state1Time);
       }
     }
-  };
-
-  // send the node for later .state changes
-  const firstStages = (child: Element) => {
-    if (child.classList.contains('state-2')) {
-      child.classList.add('state-3');
-    } else if (child.classList.contains('state-1')) {
-      child.classList.add('state-2');
-    } else if (!child.classList.contains('state-1')) {
-      child.classList.add('state-1');
-      setTimeout(secondStages.bind(null, child), 100);
-    }
-  };
-
-  const secondStages = (child: Element) => {
-    if (child.classList.contains('state-1')) {
-      child.classList.add('state-2');
-      setTimeout(thirdStages.bind(null, child), 100);
-    } else if (!child.classList.contains('state-1')) {
-      child.classList.add('state-1');
-    }
-  };
-
-  const thirdStages = (child: Element) => {
-    if (child.classList.contains('state-2')) {
-      child.classList.add('state-3');
-    }
-  };
+  }, [firstStages]);
 
   const shuffle = (array: any[]) => {
     let currentIndex = array.length,
@@ -78,12 +81,12 @@ export const DecodeText: React.FC<{ text: string }> = (props) => {
     return array;
   };
 
-  useEffect(function runDecode() {
-    decode();
-  }, []);
+  useEffect(function staggeredDecode() {
+    setTimeout(() => decode(), delay)
+  }, [decode, delay]);
 
   return (
-    <div className="decode-text">
+    <div className={`decode-text ${classNames}`} ref={textRef}>
       {textArray.map((letter, index) => (
         <div key={`${letter}${index}`} className="text-animation">{letter}</div>
       ))}
