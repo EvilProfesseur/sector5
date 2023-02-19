@@ -1,11 +1,11 @@
-import { IShader, UniformsRequired } from "../../shader.types";
+import { IShader, ShaderPrecision, UniformsRequired } from "../../shader.types";
 
-export const blackFlower: IShader = {
+export const blackFlower: (precision: ShaderPrecision) => IShader = (precision) => ({
     uniformsRequired: [UniformsRequired.resolution, UniformsRequired.time],
     code: `
     #define P 3.1415926535897932384
 
-    precision highp float;
+    precision ${precision} float;
     uniform float iTime;
     uniform vec3 iResolution;
 
@@ -44,7 +44,7 @@ export const blackFlower: IShader = {
 
     #define MIN_DIST 1.5
     #define MAX_DIST 8.
-    #define MAX_STEPS 500
+    #define MAX_STEPS 200
     #define LIM .0001
     vec3 rm(vec3 c, vec3 r) {
         vec3 color = vec3(.0);
@@ -73,4 +73,4 @@ export const blackFlower: IShader = {
         gl_FragColor = vec4(color,1.0);
     }
 `
-}
+})

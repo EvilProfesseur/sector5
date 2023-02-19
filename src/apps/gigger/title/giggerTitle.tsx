@@ -8,7 +8,7 @@ export const GiggerTitle = () => {
     const initMessages = [
         'Establishing a secure connection...', 
         'Validating your identity...',
-        'Obscufating packet route...'
+        'Obfuscating packet route...'
     ];
 
     return (

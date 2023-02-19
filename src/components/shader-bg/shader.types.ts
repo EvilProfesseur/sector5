@@ -4,6 +4,12 @@ export enum UniformsRequired {
     mouse = 'MOUSE',
 }
 
+export enum ShaderPrecision {
+    low = 'lowp',
+    med = 'mediump',
+    high = 'highp'
+}
+
 export interface IShader {
     uniformsRequired: UniformsRequired[],
     code: string;

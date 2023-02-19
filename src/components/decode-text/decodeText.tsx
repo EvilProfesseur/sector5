@@ -5,6 +5,7 @@ import { IDecodeTextProps } from './decodeText.types';
 export const DecodeText: FC<IDecodeTextProps> = ({text, classNames, delay = 0}) => {
   const textRef = useRef<HTMLDivElement>(null);
   const textArray = text.split('');
+  const stageTimeout = 100;
 
   // send the node for later .state changes
   const firstStages = useCallback((child: Element) => {
@@ -14,14 +15,14 @@ export const DecodeText: FC<IDecodeTextProps> = ({text, classNames, delay = 0}) 
       child.classList.add('state-2');
     } else if (!child.classList.contains('state-1')) {
       child.classList.add('state-1');
-      setTimeout(secondStages.bind(null, child), 100);
+      setTimeout(secondStages.bind(null, child), stageTimeout);
     }
   }, []);
 
   const secondStages = (child: Element) => {
     if (child.classList.contains('state-1')) {
       child.classList.add('state-2');
-      setTimeout(thirdStages.bind(null, child), 100);
+      setTimeout(thirdStages.bind(null, child), stageTimeout);
     } else if (!child.classList.contains('state-1')) {
       child.classList.add('state-1');
     }
@@ -55,7 +56,7 @@ export const DecodeText: FC<IDecodeTextProps> = ({text, classNames, delay = 0}) 
       const classes = child.classList;
 
       // fire the first one at random times
-      var state1Time = Math.round(Math.random() * (2000 - 300)) + 50;
+      var state1Time = Math.round(Math.random() * (1600 - (stageTimeout * 3))) + 50;
       if (classes.contains('text-animation')) {
         setTimeout(firstStages.bind(null, child), state1Time);
       }
